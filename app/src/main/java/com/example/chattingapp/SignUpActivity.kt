@@ -1,19 +1,28 @@
 package com.example.chattingapp
 
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.view.MotionEvent
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import com.mikhaellopez.circularimageview.CircularImageView
 import kotlinx.android.synthetic.main.activity_signup_2.*
+import kotlinx.android.synthetic.main.activity_userlist.*
 import model.User
+import java.io.ByteArrayOutputStream
 
 class SignUpActivity : AppCompatActivity() {
     private lateinit var img: CircularImageView
@@ -60,6 +69,16 @@ class SignUpActivity : AppCompatActivity() {
 
         })
 
+        signup_form.setOnTouchListener(object : View.OnTouchListener {
+            override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
+                val imm: InputMethodManager =
+                    getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
+                return true
+            }
+
+        })
+
 
     }
 
@@ -89,6 +108,33 @@ class SignUpActivity : AppCompatActivity() {
                         if (currUser != null) {
                             addUsertoDB(User(name, email, password, currUser.uid))
                         }
+
+
+                        val storage = Firebase.storage("gs://feisty-flow-326908.appspot.com")
+
+                        val storageRef = storage.reference
+
+// Create a reference to "mountains.jpg"
+                        var imgName: String = "image$email"
+                        val mountainsRef = storageRef.child("${imgName}.png")
+
+// Create a reference to 'images/mountains.jpg'
+                        val mountainImagesRef = storageRef.child("images/${imgName}.png")
+
+                        img.isDrawingCacheEnabled = true
+                        img.buildDrawingCache()
+                        val bitmap = (img.drawable as BitmapDrawable).bitmap
+                        val baos = ByteArrayOutputStream()
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
+                        val data = baos.toByteArray()
+
+                        var uploadTask = mountainsRef.putBytes(data)
+                        uploadTask.addOnFailureListener {
+                            // Handle unsuccessful uploads
+                        }.addOnSuccessListener { taskSnapshot ->
+                            // taskSnapshot.metadata contains file metadata such as size, content-type, etc.
+                            // ...
+                        }
                         onBackPressed()
 
                     } else {
@@ -104,6 +150,8 @@ class SignUpActivity : AppCompatActivity() {
 
                 }
         }
+
+
     }
 
     fun addUsertoDB(user: User) {

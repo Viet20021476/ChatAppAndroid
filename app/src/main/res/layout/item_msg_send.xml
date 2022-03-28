@@ -5,15 +5,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginTop="8dp"
+    android:layout_marginEnd="10dp"
     android:layout_marginBottom="20dp">
 
     <TextView
         android:id="@+id/tv_msg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/round_item"
+        android:background="@drawable/bg_msg_send"
+        android:fontFamily="sans-serif-medium"
+        android:padding="8dp"
         android:text="Đây là một dòng tin nhắn"
-        android:textSize="22sp"
+        android:textColor="#DFD2D2"
+        android:textSize="18sp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -21,6 +26,7 @@
         android:id="@+id/tv_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
         android:text="Đây là thời gian gửi"
         android:textSize="15sp"
         app:layout_constraintRight_toRightOf="@id/tv_msg"
