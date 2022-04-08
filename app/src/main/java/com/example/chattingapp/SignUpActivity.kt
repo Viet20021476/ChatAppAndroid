@@ -6,6 +6,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -18,14 +19,14 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import com.mikhaellopez.circularimageview.CircularImageView
+import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.android.synthetic.main.activity_signup_2.*
 import kotlinx.android.synthetic.main.activity_userlist.*
 import model.User
 import java.io.ByteArrayOutputStream
 
 class SignUpActivity : AppCompatActivity() {
-    private lateinit var img: CircularImageView
+    private lateinit var img: CircleImageView
     private lateinit var auth: FirebaseAuth
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,11 +115,9 @@ class SignUpActivity : AppCompatActivity() {
 
                         val storageRef = storage.reference
 
-// Create a reference to "mountains.jpg"
                         var imgName: String = "image$email"
                         val mountainsRef = storageRef.child("${imgName}.png")
 
-// Create a reference to 'images/mountains.jpg'
                         val mountainImagesRef = storageRef.child("images/${imgName}.png")
 
                         img.isDrawingCacheEnabled = true
@@ -155,16 +154,29 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     fun addUsertoDB(user: User) {
-        var dbRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("users")
-        dbRef.push().setValue(user)
+        var dbRef: DatabaseReference =
+            FirebaseDatabase.getInstance().getReference("users").child(user.uid)
+        dbRef.setValue(user)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         var uri: Uri? = data?.data
+        Log.d("uri", uri.toString())
         img.setImageURI(uri)
 
+    }
+
+    override fun onStop() {
+        Log.d("Vit", "signup activity Stop")
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+
+        Log.d("Vit", "sign up activity Destroy")
+        super.onDestroy()
     }
 }
 

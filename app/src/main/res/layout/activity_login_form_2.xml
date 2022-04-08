@@ -4,10 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#313847"
-    android:orientation="vertical"
     android:clickable="true"
     android:focusable="true"
-    android:focusableInTouchMode="true">
+    android:focusableInTouchMode="true"
+    android:orientation="vertical">
 
 
     <ImageView
@@ -63,12 +63,22 @@
         android:textColorHint="#EEEEF1"
         android:textSize="22sp" />
 
+    <CheckBox
+        android:id="@+id/cb_saveLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="5dp"
+        android:text="Ghi nhớ tài khoản"
+        android:textColor="@color/white"
+        android:textSize="16sp" />
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="20dp"
         android:layout_marginRight="20dp"
         android:background="@drawable/btn_login_design"
         android:fontFamily="sans-serif-medium"

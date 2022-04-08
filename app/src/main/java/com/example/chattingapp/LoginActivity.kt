@@ -1,24 +1,29 @@
 package com.example.chattingapp
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import android.view.animation.AlphaAnimation
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import kotlinx.android.synthetic.main.activity_login_form_2.*
-import model.User
+
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
+    private lateinit var loginPreferences: SharedPreferences
+    private lateinit var loginPrefsEditor: SharedPreferences.Editor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        installSplashScreen()
         setContentView(R.layout.activity_login_form_2)
-
         init()
         handleEvent()
 
@@ -26,6 +31,11 @@ class LoginActivity : AppCompatActivity() {
 
     fun init() {
         auth = FirebaseAuth.getInstance()
+        loginPreferences = getSharedPreferences("myPref", MODE_PRIVATE)
+        loginPrefsEditor = loginPreferences.edit()
+
+        edt_email.setText(loginPreferences.getString("email", ""))
+        edt_password.setText(loginPreferences.getString("password", ""))
     }
 
     fun handleEvent() {
@@ -48,7 +58,9 @@ class LoginActivity : AppCompatActivity() {
             override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
                 val imm: InputMethodManager =
                     getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
+                if (currentFocus != null) {
+                    imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
+                }
                 return true
             }
 
@@ -75,6 +87,16 @@ class LoginActivity : AppCompatActivity() {
                         edt_email.setText("")
                         edt_password.setText("")
 
+                        if (cb_saveLogin.isChecked) {
+                            loginPrefsEditor.putString("email", email);
+                            loginPrefsEditor.putString("password", password);
+                            loginPrefsEditor.commit();
+
+                            Log.d("checkk", email)
+                        }
+
+                        cb_saveLogin.isChecked = false
+
                     } else {
                         // If sign in fails, display a message to the user.
                         Toast.makeText(
@@ -85,6 +107,24 @@ class LoginActivity : AppCompatActivity() {
                             .show()
                     }
                 }
+        } else {
+            Toast.makeText(
+                applicationContext,
+                "Thông tin không được để trống!",
+                Toast.LENGTH_SHORT
+            )
+                .show()
         }
+    }
+
+    override fun onStop() {
+        Log.d("Vit", "login activity Stop")
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+
+        Log.d("Vit", "login activity Destroy")
+        super.onDestroy()
     }
 }

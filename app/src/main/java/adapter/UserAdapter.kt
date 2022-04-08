@@ -46,7 +46,17 @@ class UserAdapter(private var userList: MutableList<User>, private var activity:
         holder.userName.text = user.name
         holder.lastmsg.text = ""
 
-        displayLastMSG(FirebaseAuth.getInstance().currentUser!!.uid, user.uid, holder.lastmsg)
+        if (user.status == "online") {
+            holder.itemView.iv_status_item.setImageResource(R.drawable.ic_online)
+        } else {
+            holder.itemView.iv_status_item.setImageResource(R.drawable.ic_offline)
+        }
+
+        displayLastMSG(
+            FirebaseAuth.getInstance().currentUser!!.uid,
+            user.uid,
+            holder.lastmsg,
+        )
 
         val storage = Firebase.storage
 
@@ -71,6 +81,9 @@ class UserAdapter(private var userList: MutableList<User>, private var activity:
                 bundle.putString("name", user.name)
                 bundle.putString("uid", user.uid)
                 bundle.putString("email", user.email)
+                bundle.putString("status", user.status)
+                bundle.putInt("pos", holder.adapterPosition)
+                bundle.putParcelableArrayList("user_list", ArrayList(userList))
                 intent.putExtras(bundle)
 
                 activity.startActivity(intent)
@@ -85,7 +98,11 @@ class UserAdapter(private var userList: MutableList<User>, private var activity:
         return userList.size
     }
 
-    fun displayLastMSG(senderId: String, receiverId: String, lastmsg: TextView) {
+    fun displayLastMSG(
+        senderId: String,
+        receiverId: String,
+        lastMsg: TextView,
+    ) {
         val currUser = FirebaseAuth.getInstance().currentUser
         val dbRef =
             FirebaseDatabase.getInstance().getReference("messages").child(senderId + receiverId)
@@ -103,7 +120,7 @@ class UserAdapter(private var userList: MutableList<User>, private var activity:
                             .equals(senderId))))
                     ) {
                         Log.d("Vitt", "INNNNNNNNNNNNNNNN")
-                        lastmsg.text = msg?.getText()
+                        lastMsg.text = msg?.getText() + " " + msg?.getTime()
                     }
                 }
             }

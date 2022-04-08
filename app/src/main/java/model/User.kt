@@ -1,8 +1,29 @@
 package model
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
 import java.io.Serializable
 
-class User(var name: String, var email: String, var password: String, var uid: String) {
+@Parcelize
+class User(
+    var name: String,
+    var email: String,
+    var password: String,
+    var uid: String,
+    var status: String,
+    var lastOnline: String,
+    var timeStamp: Map<String, String>
+) : Parcelable {
 
     constructor() : this("", "", "", "")
+
+    constructor(name: String, email: String, password: String, uid: String) : this(
+        name,
+        email,
+        password,
+        uid,
+        "offline",
+        "",
+        HashMap()
+    )
 }
