@@ -55,7 +55,6 @@ class UserListActivity : AppCompatActivity() {
         dbRef.orderByChild("timestamp").addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 userList.clear()
-                Log.d("thay doi","Thay doi")
 
                 for (postSnapShot in snapshot.children) {
                     var user = postSnapShot.getValue(User::class.java)
@@ -85,7 +84,6 @@ class UserListActivity : AppCompatActivity() {
 
         dbRef.orderByChild("timestamp").addValueEventListener(object :ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
-                Log.d("lll","Change")
             }
 
             override fun onCancelled(error: DatabaseError) {

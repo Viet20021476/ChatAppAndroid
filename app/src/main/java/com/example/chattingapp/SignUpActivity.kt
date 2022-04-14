@@ -56,7 +56,7 @@ class SignUpActivity : AppCompatActivity() {
 
         })
 
-        profile_pic.setOnClickListener(object : View.OnClickListener {
+        iv_cam.setOnClickListener(object : View.OnClickListener {
             override fun onClick(p0: View?) {
                 ImagePicker.with(this@SignUpActivity)
 //                    .crop()                    //Crop image(Optional), Check Customization for more option
@@ -70,8 +70,42 @@ class SignUpActivity : AppCompatActivity() {
 
         })
 
+        tb_signup.setOnTouchListener(object : View.OnTouchListener {
+            override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
+                tb_signup.requestFocus()
+                val imm: InputMethodManager =
+                    getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
+                return true
+            }
+
+        })
+
+        tv_signup.setOnTouchListener(object : View.OnTouchListener {
+            override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
+                tv_signup.requestFocus()
+                val imm: InputMethodManager =
+                    getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
+                return true
+            }
+
+        })
+
+        profile_pic.setOnTouchListener(object : View.OnTouchListener {
+            override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
+                profile_pic.requestFocus()
+                val imm: InputMethodManager =
+                    getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
+                return true
+            }
+
+        })
+
         signup_form.setOnTouchListener(object : View.OnTouchListener {
             override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
+                signup_form.requestFocus()
                 val imm: InputMethodManager =
                     getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
@@ -106,11 +140,6 @@ class SignUpActivity : AppCompatActivity() {
 
                         var currUser = auth.currentUser
 
-                        if (currUser != null) {
-                            addUsertoDB(User(name, email, password, currUser.uid))
-                        }
-
-
                         val storage = Firebase.storage("gs://feisty-flow-326908.appspot.com")
 
                         val storageRef = storage.reference
@@ -133,11 +162,26 @@ class SignUpActivity : AppCompatActivity() {
                         }.addOnSuccessListener { taskSnapshot ->
                             // taskSnapshot.metadata contains file metadata such as size, content-type, etc.
                             // ...
+                            mountainsRef.downloadUrl.addOnSuccessListener { uri ->
+                                val profileImgUrl = uri.toString()
+
+                                if (currUser != null) {
+                                    addUsertoDB(
+                                        User(
+                                            name,
+                                            email,
+                                            password,
+                                            currUser.uid,
+                                            profileImgUrl
+                                        )
+                                    )
+                                }
+                            }
                         }
                         onBackPressed()
 
                     } else {
-                        // If sign in fails, display a message to the user.
+                        // If sign up fails, display a message to the user.
                         Toast.makeText(
                             applicationContext,
                             "Đăng ký tài khoản thất bại!",

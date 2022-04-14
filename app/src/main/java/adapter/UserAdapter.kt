@@ -62,10 +62,7 @@ class UserAdapter(private var userList: MutableList<User>, private var activity:
 
         val storageRef = storage.reference
 
-        val gsRef = storage.getReferenceFromUrl(
-            "gs://feisty-flow-326908.appspot.com/image" +
-                    "${user.email}.png"
-        )
+        val gsRef = storage.getReferenceFromUrl(user.profileImgUrl)
 
         gsRef.downloadUrl
             .addOnSuccessListener { urlImage ->
@@ -112,14 +109,11 @@ class UserAdapter(private var userList: MutableList<User>, private var activity:
                 for (postSnapshot in snapshot.children) {
                     val msg = postSnapshot.getValue(Message::class.java)
 
-                    if (msg != null) Log.d("Vitt", msg.getSenderId())
-
                     if ((msg?.getSenderId().equals(senderId) && (msg?.getReceiverId()
                             .equals(receiverId))) || ((msg?.getSenderId()
                             .equals(receiverId) && (msg?.getReceiverId()
                             .equals(senderId))))
                     ) {
-                        Log.d("Vitt", "INNNNNNNNNNNNNNNN")
                         lastMsg.text = msg?.getText() + " " + msg?.getTime()
                     }
                 }

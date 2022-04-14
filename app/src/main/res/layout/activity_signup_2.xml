@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/signup_form"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/signup_form"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#313847"
-    android:orientation="vertical"
     android:clickable="true"
     android:focusable="true"
-    android:focusableInTouchMode="true">
+    android:focusableInTouchMode="true"
+    android:orientation="vertical">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/tb_signup"
@@ -17,12 +17,15 @@
         app:navigationIcon="?attr/homeAsUpIndicator" />
 
     <TextView
+        android:id="@+id/tv_signup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="100dp"
         android:gravity="center"
         android:text="Đăng ký tài khoản"
         android:textColor="#2564E0"
+        android:focusable="true"
+        android:clickable="true"
         android:textSize="30sp"
         android:textStyle="bold" />
 
@@ -32,9 +35,19 @@
         android:layout_height="100dp"
         android:layout_gravity="center"
         android:layout_marginTop="20dp"
+        android:focusable="true"
+        android:clickable="true"
         android:background="@drawable/profile"
         android:src="@drawable/person_icon_png" />
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_cam"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_gravity="center"
+        android:layout_marginLeft="35dp"
+        android:layout_marginTop="-30dp"
+        android:src="@drawable/ic_cam" />
 
     <EditText
         android:id="@+id/edt_user_name"

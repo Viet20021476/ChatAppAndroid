@@ -2,8 +2,6 @@ package adapter
 
 import android.app.Activity
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +10,9 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -21,6 +22,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import de.hdodenhof.circleimageview.CircleImageView
+import kotlinx.android.synthetic.main.activity_chat.*
 import model.Message
 
 
@@ -51,39 +53,93 @@ class MSGAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
 
-        var msg: Message = msgList[position]
-        Log.d("checkdl", msg.getDownloadUri())
+        val storage = Firebase.storage
 
+        val storageRef = storage.reference
+
+        var msg: Message = msgList[position]
 
         if (holder.javaClass == SendMSGViewHolder::class.java) {
             val viewHolder = holder as SendMSGViewHolder
             if (msg.getType() == "text") {
                 viewHolder.ivImageMsg.visibility = View.GONE
+                viewHolder.getTVMSG().visibility = View.VISIBLE
+                viewHolder.getTVTime().visibility = View.VISIBLE
                 viewHolder.getTVMSG().text = msg.getText()
                 viewHolder.getTVTime().text = msg.getTime()
+
+//                if (position == msgList.size - 1) {
+//                    if (msg.isSeen) {
+//
+//                        val drawable = chatActivity.iv_profile_pic_chat.drawable
+//                        if (drawable == null) Log.d("checknull", "NULLLLLLLLL")
+//                        viewHolder.ivSeen.setImageDrawable(R.drawable.chi.toDrawable())
+//                    }
+//                }
+
+                if (position == msgList.size - 1) {
+                    if (msg.isSeen) {
+                        viewHolder.ivSeen.visibility = View.VISIBLE
+                        val drawable = chatActivity.iv_profile_pic_chat.drawable
+                        viewHolder.ivSeen.setImageDrawable(drawable)
+                    } else {
+                        viewHolder.ivSeen.visibility = View.GONE
+                    }
+                } else if (position == msgList.size - 2 && !msgList[msgList.size - 1].isSeen) {
+                    if (msg.isSeen) {
+                        viewHolder.ivSeen.visibility = View.VISIBLE
+                        val drawable = chatActivity.iv_profile_pic_chat.drawable
+                        viewHolder.ivSeen.setImageDrawable(drawable)
+                    } else {
+                        viewHolder.ivSeen.visibility = View.GONE
+                    }
+                } else {
+                    viewHolder.ivSeen.visibility = View.GONE
+                }
+
             } else {
                 viewHolder.getTVMSG().visibility = View.GONE
+                viewHolder.getTVTime().visibility = View.VISIBLE
+                viewHolder.ivImageMsg.visibility = View.VISIBLE
+                viewHolder.getTVTime().text = msg.getTime()
 
-                val storage = Firebase.storage
+                val constraintSet = ConstraintSet()
+                constraintSet.clone(viewHolder.clMsgSend_layout)
+                constraintSet.connect(
+                    viewHolder.getTVTime().id,
+                    ConstraintSet.TOP,
+                    viewHolder.ivImageMsg.id,
+                    ConstraintSet.BOTTOM,
+                    0
+                )
+                constraintSet.applyTo(viewHolder.clMsgSend_layout)
 
-                val storageRef = storage.reference
+                val gsRef = storage.getReferenceFromUrl(msg.getDownloadUrl())
 
-                val gsRef = storage.getReferenceFromUrl(msg.getDownloadUri())
-
-                Log.d("name", gsRef.name)
-
-                val handler = Handler()
-
-                Handler(Looper.getMainLooper()).postDelayed(object : Runnable {
-                    override fun run() {
-                        gsRef.downloadUrl
-                            .addOnSuccessListener { urlImage ->
-                                Glide.with(chatActivity).load(urlImage).into(viewHolder.ivImageMsg)
-                            }
+                gsRef.downloadUrl
+                    .addOnSuccessListener { urlImage ->
+                        Glide.with(chatActivity).load(urlImage).into(viewHolder.ivImageMsg)
                     }
-                }, 1000)
 
-
+                if (position == msgList.size - 1) {
+                    if (msg.isSeen) {
+                        viewHolder.ivSeen.visibility = View.VISIBLE
+                        val drawable = chatActivity.iv_profile_pic_chat.drawable
+                        viewHolder.ivSeen.setImageDrawable(drawable)
+                    } else {
+                        viewHolder.ivSeen.visibility = View.GONE
+                    }
+                } else if (position == msgList.size - 2 && !msgList[msgList.size - 1].isSeen) {
+                    if (msg.isSeen) {
+                        viewHolder.ivSeen.visibility = View.VISIBLE
+                        val drawable = chatActivity.iv_profile_pic_chat.drawable
+                        viewHolder.ivSeen.setImageDrawable(drawable)
+                    } else {
+                        viewHolder.ivSeen.visibility = View.GONE
+                    }
+                } else {
+                    viewHolder.ivSeen.visibility = View.GONE
+                }
             }
 
             viewHolder.clMsgSend.setOnClickListener(object : View.OnClickListener {
@@ -106,29 +162,46 @@ class MSGAdapter(
             if (msg.getType() == "text") {
                 viewHolder.getTVMSGR().text = msg.getText()
                 viewHolder.getTVTimeR().text = msg.getTime()
+                viewHolder.getTVMSGR().visibility = View.VISIBLE
+                viewHolder.getTVTimeR().visibility = View.VISIBLE
                 viewHolder.ivImageMsgR.isVisible = false
             } else {
-                viewHolder.getTVMSGR().isVisible = false
+                viewHolder.getTVMSGR().visibility = View.GONE
+                viewHolder.getTVTimeR().visibility = View.VISIBLE
+                viewHolder.ivImageMsgR.visibility = View.VISIBLE
+                viewHolder.getTVTimeR().text = msg.getTime()
+
+                val constraintSet = ConstraintSet()
+                constraintSet.clone(viewHolder.clMsgReceive_layout)
+                constraintSet.connect(
+                    viewHolder.getTVTimeR().id,
+                    ConstraintSet.TOP,
+                    viewHolder.ivImageMsgR.id,
+                    ConstraintSet.BOTTOM,
+                    0
+                )
+                constraintSet.applyTo(viewHolder.clMsgReceive_layout)
+
 
                 val storage = Firebase.storage
 
                 val storageRef = storage.reference
 
-                if (msg.getDownloadUri() != "") {
+                if (msg.getDownloadUrl() != "") {
 
-                    val gsRef = storage.getReferenceFromUrl(msg.getDownloadUri())
+                    val gsRef = storage.getReferenceFromUrl(msg.getDownloadUrl())
 
-                    Log.d("url", msg.getDownloadUri())
-
-                    Handler(Looper.getMainLooper()).postDelayed(object : Runnable {
-                        override fun run() {
-                            gsRef.downloadUrl
-                                .addOnSuccessListener { urlImage ->
-                                    Glide.with(chatActivity).load(urlImage)
-                                        .into(viewHolder.ivImageMsgR)
-                                }
+                    gsRef.downloadUrl
+                        .addOnSuccessListener { urlImage ->
+                            Glide.with(chatActivity).load(urlImage)
+                                .into(viewHolder.ivImageMsgR)
                         }
-                    }, 1000)
+
+//                    Handler(Looper.getMainLooper()).postDelayed(object : Runnable {
+//                        override fun run() {
+//
+//                        }
+//                    }, 1000)
 
 
                 }
@@ -177,12 +250,16 @@ class MSGAdapter(
         private var tvTime: TextView
         var ivImageMsg: AppCompatImageView
         var clMsgSend: View
+        var clMsgSend_layout: ConstraintLayout
+        var ivSeen: CircleImageView
 
         init {
             tvMsg = itemView.findViewById(R.id.tv_msg)
             tvTime = itemView.findViewById(R.id.tv_time)
             ivImageMsg = itemView.findViewById(R.id.iv_imgMsg)
             clMsgSend = itemView.findViewById(R.id.cl_msg_send)
+            clMsgSend_layout = itemView.findViewById(R.id.cl_msg_send)
+            ivSeen = itemView.findViewById(R.id.iv_seen)
 
             tvMsg.maxWidth = (chatActivity.getScreenWidth() / 2 + 50)
         }
@@ -198,6 +275,7 @@ class MSGAdapter(
         var ivReceiverPic: CircleImageView
         var ivImageMsgR: AppCompatImageView
         var clMsgReceive: View
+        var clMsgReceive_layout: ConstraintLayout
 
 
         init {
@@ -206,6 +284,7 @@ class MSGAdapter(
             ivReceiverPic = itemView.findViewById(R.id.iv_receiver_pic)
             clMsgReceive = itemView.findViewById(R.id.cl_msg_receive)
             ivImageMsgR = itemView.findViewById(R.id.iv_imgMsgR)
+            clMsgReceive_layout = itemView.findViewById(R.id.cl_msg_receive)
             tvMsgR.maxWidth = (chatActivity.getScreenWidth() / 2 + 50)
         }
 
